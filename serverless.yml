@@ -1,0 +1,60 @@
+org: serverlessª∞
+app: serverless-telegram-bot
+service: serverless-telegram-bot
+
+custom:
+  stage: ${file(./serverless.env.yml):STAGE, ''}
+  logRetentionInDays:
+    prod: 90
+    dev: 30
+    qa: 30
+
+provider:
+  name: aws
+  runtime: python3.7
+  memorySize: 256
+  environment:
+    TELEGRAM_TOKEN: ${file(./serverless.env.yml):TELEGRAM_TOKEN, ''}
+    STAGE: ${file(./serverless.env.yml):STAGE, 'local'}
+    TELEGRAM_UPDATES_TABLE: ${file(./serverless.env.yml):TELEGRAM_UPDATES_TABLE, 'telegram_updates'}
+  logRetentionInDays: ${self:custom.logRetentionInDays.${self:custom.stage}}
+
+functions:
+  webhook:
+    handler: handler.webhook
+    events:
+      - http: POST /
+
+  set_webhook:
+    handler: src/telegrambot.set_webhook
+    events:
+      - http: POST /set_webhook
+
+  cron:
+    handler: cron.handler
+    events:
+      - schedule:
+          rate: rate(1 minute)
+          enabled: false
+          stageParams:
+              stage: dev
+
+resources: 
+  Resources:
+
+    telegramUpdatesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: telegram_updates
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+plugins:
+  - serverless-python-requirements

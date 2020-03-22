@@ -1,0 +1,21 @@
+{
+  "name": "serverless-telegram-bot",
+  "description": "Boilerplate for a telegram text-bot",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/demondehellis/serverless-telegram-bot.git"
+  },
+  "keywords": [
+    "python",
+    "aws",
+    "lambda",
+    "serverless"
+  ],
+  "author": "demondehellis",
+  "license": "MIT",
+  "dependencies": {
+    "serverless-python-requirements": "^3.0.9"
+  },
+  "homepage": "https://github.com/demondehellis/serverless-telegram-bot"
+}
